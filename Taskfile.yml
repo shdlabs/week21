@@ -1,0 +1,24 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - task: go:test
+    silent: true
+
+  go:test:
+    desc: Run go tests with coverage and race detector
+    sources:
+      - "./**/*_test.go"
+    cmds:
+      - set -o pipefail && go test -cover -race ./... -json | gotestfmt
+
+  go:tidy:
+    desc: Run go mod tidy
+    cmds:
+      - go mod tidy

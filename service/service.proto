@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/shdlabs/week21/service";
+message UserReply {
+  int32 id = 1;
+  string fname = 2;
+  string city = 3;
+  string phone = 4;
+  float height = 5;
+  bool Married = 6;
+}
+
+message UserRequest { int32 id = 1; }
+
+service QueryUser {
+  rpc GetUser(UserRequest) returns (UserReply) {}
+}
