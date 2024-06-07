@@ -22,3 +22,14 @@ tasks:
     desc: Run go mod tidy
     cmds:
       - go mod tidy
+
+  go:web:run:
+    desc: Run dev web server
+    watch: true
+    sources:
+      - "./client/web/**/*.*"
+    generates:
+      - "./bin/web"
+    cmds:
+      - go build -o ./bin/web ./client/web/main.go
+      - ./bin/web

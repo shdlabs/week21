@@ -55,9 +55,9 @@ func main() {
 func mockTheData() service.DbMock {
 	db := service.NewDBMock()
 	db.NewUsers(
-		service.NewUser("John", "NY", "123456789", 1.75, true),
-		service.NewUser("Steve", "LA", "123456789", 1.75, true),
-		service.NewUser("Bill", "LA", "123456789", 1.75, true),
+		service.NewUser("John", "NY", "123456789", 1.75, false),
+		service.NewUser("Steve", "CF", "123456789", 1.95, true),
+		service.NewUser("Bill", "TA", "123456789", 1.85, false),
 		service.NewUser("Joe", "LA", "123456789", 1.75, true),
 	)
 	return db
