@@ -9,10 +9,20 @@ import (
 
 func NotNil(t *testing.T, data any) {
 	t.Helper()
+	t.Run("NotNil", func(t *testing.T) {
+		if data == nil {
+			t.Error(Ko("was not expecting `nil`"))
+		}
+	})
+}
 
-	if data == nil {
-		t.Error(Ko("Expected not empty"))
-	}
+func NoError(t *testing.T, err error) {
+	t.Helper()
+	t.Run("NoError", func(t *testing.T) {
+		if err != nil {
+			t.Errorf(Ko("was not expecting error...\n\tGOT: `%#v`"), err)
+		}
+	})
 }
 
 func LogDuration(start time.Time) {

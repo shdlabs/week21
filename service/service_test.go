@@ -16,6 +16,7 @@ func TestTheBeggining(t *testing.T) {
 		if user == (User{}) {
 			t.Error(h.Ko("Expected not empty"))
 		}
+		h.NotNil(t, user)
 	})
 
 	t.Run("NewDBMock", func(t *testing.T) {
@@ -28,7 +29,7 @@ func TestTheBeggining(t *testing.T) {
 			NewUser("Bill", "LA", "123456789", 1.75, true),
 		)
 
-		t.Logf(h.Ok("%v"), db)
+		t.Logf(h.Ok("\n%#v"), db)
 
 		if len(db) != 3 {
 			t.Error(h.Ko("Expected 3"))
