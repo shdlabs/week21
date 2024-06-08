@@ -19,6 +19,7 @@ func main() {
 	port := flag.String("port", "50051", "Server port")
 
 	flag.Parse()
+	defer h.DurationLog(time.Now(), "client")
 
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(
@@ -26,7 +27,7 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Fatalf("did not connect: %#v", err)
 	}
 
 	defer conn.Close()
@@ -36,8 +37,6 @@ func main() {
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-
-	defer h.LogDuration(time.Now())
 
 	r, err := c.GetUser(ctx, &service.UserRequest{Id: int32(*id)})
 	if err != nil {

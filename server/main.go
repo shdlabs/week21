@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -21,12 +20,9 @@ type server struct {
 func (s *server) GetUser(ctx context.Context, in *service.UserRequest) (*service.UserReply, error) {
 	log.Printf("Received: %v", in.GetId())
 
-	defer h.LogDuration(time.Now())
+	defer h.DurationLog(time.Now(), "GetUser")
 
-	u, ok := s.db[in.GetId()]
-	if !ok {
-		return nil, errors.New("no such user ID")
-	}
+	u := s.db.FindUser(in.GetId())
 
 	return &service.UserReply{
 		Id: u.ID, Fname: u.Fname,
@@ -60,5 +56,6 @@ func mockTheData() service.DbMock {
 		service.NewUser("Bill", "TA", "123456789", 1.85, false),
 		service.NewUser("Joe", "LA", "123456789", 1.75, true),
 	)
+
 	return db
 }

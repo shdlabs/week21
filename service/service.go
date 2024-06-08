@@ -1,10 +1,12 @@
 package service
 
+import "errors"
+
 type User struct {
-	ID      int32   `json:"id"`
 	Fname   string  `json:"fname"`
 	City    string  `json:"city"`
 	Phone   string  `json:"phone"`
+	ID      int32   `json:"id"`
 	Height  float32 `json:"height"`
 	Married bool    `json:"Married"`
 }
@@ -38,6 +40,26 @@ func NewUser(fname, city string, phone string, height float32, married bool) Use
 	}
 }
 
+func (db DbMock) AddUser(id int32, fname, city string, phone string, height float32, married bool) error {
+	if _, ok := db[id]; ok {
+		return errors.New("user ID exists")
+	}
+	db[id] = User{
+		ID:      id,
+		Fname:   fname,
+		City:    city,
+		Phone:   phone,
+		Height:  height,
+		Married: married,
+	}
+
+	return nil
+}
+
 func (db DbMock) FindUser(id int32) User {
+	if _, ok := db[id]; !ok {
+		return User{}
+	}
+
 	return db[id]
 }

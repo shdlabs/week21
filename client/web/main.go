@@ -3,19 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/shdlabs/week21/client/web/server"
-	"github.com/shdlabs/week21/helpers"
+	h "github.com/shdlabs/week21/helpers"
 	"github.com/shdlabs/week21/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+	log.Info("starting web client")
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(
 		"asus:50051",
@@ -32,11 +34,11 @@ func main() {
 	// Contact the server and print out its response.
 
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
-		defer helpers.LogDuration(time.Now())
+		defer h.DurationLog(time.Now(), "/search")
 		q := r.URL.Query().Get("user")
 		id, err := strconv.Atoi(q)
 		if err != nil {
-			log.Println(err)
+			slog.Error("could not parse ID", "err", err)
 			id = 0
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)

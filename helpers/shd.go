@@ -1,33 +1,12 @@
 package helpers
 
 import (
-	"log"
+	"log/slog"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 )
-
-func NotNil(t *testing.T, data any) {
-	t.Helper()
-	t.Run("NotNil", func(t *testing.T) {
-		if data == nil {
-			t.Error(Ko("was not expecting `nil`"))
-		}
-	})
-}
-
-func NoError(t *testing.T, err error) {
-	t.Helper()
-	t.Run("NoError", func(t *testing.T) {
-		if err != nil {
-			t.Errorf(Ko("was not expecting error...\n\tGOT: `%#v`"), err)
-		}
-	})
-}
-
-func LogDuration(start time.Time) {
-	log.Printf(Ah("Done: %v"), time.Since(start))
-}
 
 const (
 	end     = "\033[0m"
@@ -48,14 +27,57 @@ const (
 	AH = "🤨"
 )
 
+// Ko helper function for terminal output decoration in red with ❌.
+// Not OK
 func Ko(line string) string {
 	return strings.Join([]string{red, KO, line, end}, " ")
 }
 
+// Ok helper function for terminal output decoration in green with ✅.
 func Ok(line string) string {
 	return strings.Join([]string{green, OK, line, end}, " ")
 }
 
+// Ah helper function for terminal output decoration in yellow with 😯
+// Debugging and exploartion purpose.
 func Ah(line string) string {
 	return strings.Join([]string{blue, AH, line, end}, " ")
+}
+
+func NotNil(t *testing.T, data any) {
+	t.Helper()
+	if data == nil {
+		t.Errorf(Ko("was not expecting %#v"), nil)
+	}
+}
+
+func NoError(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Errorf(Ko("was not expecting error...\n\tGOT: %#v"), err)
+	}
+}
+
+func Equal[T comparable](t *testing.T, actual, expected T) {
+	t.Helper()
+	if actual != expected {
+		t.Errorf(Ko("Not Equal => \nEXP: %#v\nGOT: %#v"), expected, actual)
+	}
+	reflect.DeepEqual(actual, expected)
+}
+
+func NotEqual[T comparable](t *testing.T, actual, expected T) {
+	t.Helper()
+	if actual == expected {
+		t.Errorf(Ko("Equal => \nEXP: %#v\nGOT: %#v"), expected, actual)
+	}
+}
+
+// DurationLog measure the duration of a function
+//
+// Usage:
+//
+//	defer helpers.DurationLog(time.Now())
+func DurationLog(start time.Time, name string) {
+	slog.Info("DURATION", "func", name, "duration", time.Since(start))
 }
