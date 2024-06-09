@@ -1,11 +1,12 @@
 package helpers
 
 import (
-	"log/slog"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/charmbracelet/log"
 )
 
 const (
@@ -79,5 +80,5 @@ func NotEqual[T comparable](t *testing.T, actual, expected T) {
 //
 //	defer helpers.DurationLog(time.Now())
 func DurationLog(start time.Time, name string) {
-	slog.Info("DURATION", "func", name, "duration", time.Since(start))
+	log.Info("DURATION", "func", name, "duration", time.Since(start))
 }

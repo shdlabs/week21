@@ -103,3 +103,89 @@ var QueryUser_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "service/service.proto",
 }
+
+// QueryAllClient is the client API for QueryAll service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type QueryAllClient interface {
+	GetAll(ctx context.Context, in *All, opts ...grpc.CallOption) (*All, error)
+}
+
+type queryAllClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewQueryAllClient(cc grpc.ClientConnInterface) QueryAllClient {
+	return &queryAllClient{cc}
+}
+
+func (c *queryAllClient) GetAll(ctx context.Context, in *All, opts ...grpc.CallOption) (*All, error) {
+	out := new(All)
+	err := c.cc.Invoke(ctx, "/QueryAll/GetAll", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// QueryAllServer is the server API for QueryAll service.
+// All implementations must embed UnimplementedQueryAllServer
+// for forward compatibility
+type QueryAllServer interface {
+	GetAll(context.Context, *All) (*All, error)
+	mustEmbedUnimplementedQueryAllServer()
+}
+
+// UnimplementedQueryAllServer must be embedded to have forward compatible implementations.
+type UnimplementedQueryAllServer struct {
+}
+
+func (UnimplementedQueryAllServer) GetAll(context.Context, *All) (*All, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedQueryAllServer) mustEmbedUnimplementedQueryAllServer() {}
+
+// UnsafeQueryAllServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to QueryAllServer will
+// result in compilation errors.
+type UnsafeQueryAllServer interface {
+	mustEmbedUnimplementedQueryAllServer()
+}
+
+func RegisterQueryAllServer(s grpc.ServiceRegistrar, srv QueryAllServer) {
+	s.RegisterService(&QueryAll_ServiceDesc, srv)
+}
+
+func _QueryAll_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(All)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryAllServer).GetAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/QueryAll/GetAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryAllServer).GetAll(ctx, req.(*All))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// QueryAll_ServiceDesc is the grpc.ServiceDesc for QueryAll service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var QueryAll_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "QueryAll",
+	HandlerType: (*QueryAllServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetAll",
+			Handler:    _QueryAll_GetAll_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "service/service.proto",
+}

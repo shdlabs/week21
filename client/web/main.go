@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,12 +22,13 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Fatalf("did not connect: %#v", err)
 	}
 
 	defer conn.Close()
 
 	c := service.NewQueryUserClient(conn)
+	d := service.NewQueryAllClient(conn)
 
 	// Contact the server and print out its response.
 
@@ -48,9 +48,29 @@ func main() {
 			return
 		}
 
-		_ = server.Index(server.User(rRes)).Render(ctx, w)
+		if err = server.Index(server.User(rRes)).Render(ctx, w); err != nil {
+			log.Error("could not render template", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
-	fmt.Println("Listening on :3000")
+	http.HandleFunc("/all", func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		rRes, err := d.GetAll(ctx, &service.All{})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		for i := range rRes.Users {
+			if err = server.Index(server.User(rRes.Users[i])).Render(ctx, w); err != nil {
+				log.Error("could not render template", "err", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		}
+	})
+
+	log.Info("Listening on :3000")
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }

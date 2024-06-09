@@ -19,7 +19,7 @@ type server struct {
 }
 
 func (s *server) GetUser(ctx context.Context, in *service.UserRequest) (*service.UserReply, error) {
-	log.Printf("Received: %v", in.GetId())
+	log.Info("Received: %v", in.GetId())
 
 	defer h.DurationLog(time.Now(), "GetUser")
 
@@ -56,6 +56,10 @@ func mockTheData() service.DbMock {
 		service.NewUser("Anne", "CF", "123456789", 1.95, true),
 		service.NewUser("Bill", "TA", "123456789", 1.85, false),
 		service.NewUser("Alex", "LA", "123456789", 1.75, true),
+		service.NewUser("Mark", "NY", "123456789", 1.75, false),
+		service.NewUser("Mike", "NY", "123456789", 1.75, true),
+		service.NewUser("Lisa", "NY", "123456789", 1.75, false),
+		service.NewUser("Kate", "NY", "123456789", 1.75, true),
 	)
 
 	return db

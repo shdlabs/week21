@@ -15,3 +15,9 @@ message UserRequest { int32 id = 1; }
 service QueryUser {
   rpc GetUser(UserRequest) returns (UserReply) {}
 }
+
+message All { repeated UserReply users = 1; }
+
+service QueryAll {
+  rpc GetAll(All) returns (All) {}
+}
