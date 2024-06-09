@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -38,7 +37,7 @@ func main() {
 		q := r.URL.Query().Get("user")
 		id, err := strconv.Atoi(q)
 		if err != nil {
-			slog.Error("could not parse ID", "err", err)
+			log.Error("could not parse ID", "err", err)
 			id = 0
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)

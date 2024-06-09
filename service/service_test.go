@@ -31,10 +31,7 @@ func TestTheBeginning(t *testing.T) {
 
 		t.Run("AddUser", func(t *testing.T) {
 			h.NoError(t, db.AddUser(42, "John", "NY", "123456789", 1.75, true))
-
-			if len(db) != 4 {
-				t.Errorf(h.Ko("Expected %d"), 4)
-			}
+			h.Equal(t, len(db), 4)
 
 			err := db.AddUser(42, "John", "NY", "123456789", 1.75, true)
 			if err == nil || err.Error() != "user ID exists" {
@@ -50,6 +47,6 @@ func TestTheBeginning(t *testing.T) {
 			h.Equal(t, user, (User{}))
 		})
 
-		t.Logf("%+v themale test \n\t", db)
+		t.Logf(h.Ok("%#v themale test \n\t"), db)
 	})
 }
