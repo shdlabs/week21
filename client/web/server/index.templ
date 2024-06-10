@@ -8,6 +8,15 @@ import (
 
 var tailwindHandle = templ.NewOnceHandle()
 
+templ head() {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		@TailWindCDN()
+		<title>Document</title>
+	</head>
+}
+
 templ TailWindCDN() {
 	@tailwindHandle.Once() {
 		<script src="https://cdn.tailwindcss.com"></script>
@@ -19,52 +28,49 @@ templ TailWindCDN() {
 }
 
 templ Index(component templ.Component) {
+	@body() {
+		@title("User")
+		<div class="flex flex-col mt-3 ">
+			@component
+		</div>
+	}
+	@footer()
+}
+
+templ body() {
 	<!DOCTYPE html>
 	<html lang="en">
 		@head()
-		<body class="p-5">
-			<h1 class="[box-shadow:--shadow-6] bg-zinc-800 p-3 rounded-[--radius-3]">User:</h1>
-			<div class="flex flex-col mt-3 ">
-				@component
-			</div>
+		<body class="p-5 antialiased">
+			{ children... }
 		</body>
 	</html>
 }
 
-templ head() {
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		@TailWindCDN()
-		<title>Document</title>
-	</head>
-}
-
-templ userButton(i int) {
-	<a
-		href={ templ.SafeURL("/search?user=" + fmt.Sprint(i)) }
-		class="text-xl font-bold px-3 py-2 rounded-lg bg-zinc-800 [box-shadow:--shadow-3]"
-	>{  fmt.Sprint(i) }</a>
+templ title(name string) {
+	<h1
+		class="[box-shadow:--shadow-6] bg-zinc-700 text-slate-300 
+					[text-shadow:2px_3px_3px_theme(colors.cyan.700/.5)] 
+					p-3 flex rounded-[--radius-3]"
+	>{ name }:</h1>
 }
 
 templ User(user *service.UserReply) {
-	<div
-		class="flex gap-3 bg-zinc-700 justify-center mt-10 mb-7 p-3 [box-shadow:--shadow-6] [border-radius:--radius-3]"
-	>
+	<div class="flex gap-3 bg-zinc-700  mt-10 mb-7 p-3 [box-shadow:--shadow-6] rounded-[--radius-3]">
 		for  i := range 10 {
 			@userButton(i)
 		}
 	</div>
-	<table
-		class="flex w-full justify-center bg-zinc-700 p-5 text-xl font-semibold [box-shadow:--shadow-6]"
-	>
+	<table class="flex w-full bg-zinc-700 p-5 text-xl font-semibold [box-shadow:--shadow-6]">
 		<tr>
+			<th>ID</th>
 			<th>F.Name</th>
 			<th>City</th>
 			<th>Phone</th>
 			<th>Married</th>
 		</tr>
 		<tr>
+			<td>{ fmt.Sprint(user.Id) }</td>
 			<td>{ user.Fname }</td>
 			<td>{ user.City }</td>
 			<td>{ user.Phone }</td>
@@ -75,4 +81,21 @@ templ User(user *service.UserReply) {
 			}
 		</tr>
 	</table>
+}
+
+templ userButton(i int) {
+	<a
+		href={ templ.SafeURL("/search?user=" + fmt.Sprint(i)) }
+		class="text-xl font-bold px-4 py-2 rounded-lg bg-zinc-800 [box-shadow:--shadow-3]
+			hover:[box-shadow:--shadow-6] hover:bg-zinc-950 transition-all duration-500 hover:scale-110"
+	>{  fmt.Sprint(i) }</a>
+}
+
+templ footer() {
+	<footer class="fixed w-full bg-zinc-950 [box-shadow:--shadow-6] bottom-0 left-0 p-6">
+		<a
+			href="https://github.com/shdlabs/week21"
+			class="text-xl font-bold relative"
+		>GitHub</a>
+	</footer>
 }

@@ -61,7 +61,7 @@ func NoError(t *testing.T, err error) {
 
 func Equal[T comparable](t *testing.T, actual, expected T) {
 	t.Helper()
-	if actual != expected {
+	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf(Ko("Not Equal => \nEXP: %#v\nGOT: %#v"), expected, actual)
 	}
 	reflect.DeepEqual(actual, expected)
@@ -69,7 +69,7 @@ func Equal[T comparable](t *testing.T, actual, expected T) {
 
 func NotEqual[T comparable](t *testing.T, actual, expected T) {
 	t.Helper()
-	if actual == expected {
+	if reflect.DeepEqual(actual, expected) {
 		t.Errorf(Ko("Equal => \nEXP: %#v\nGOT: %#v"), expected, actual)
 	}
 }

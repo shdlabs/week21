@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -15,7 +16,18 @@ import (
 )
 
 func main() {
+	logger := log.NewWithOptions(os.Stderr, log.Options{Prefix: "http"})
+	stdlog := logger.StandardLog(log.StandardLogOptions{
+		ForceLevel: log.ErrorLevel,
+	})
+	s := http.Server{
+		Addr:     ":3000",
+		Handler:  http.DefaultServeMux,
+		ErrorLog: stdlog,
+	}
+
 	log.Info("starting web client")
+
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(
 		"asus:50051",
@@ -28,9 +40,6 @@ func main() {
 	defer conn.Close()
 
 	c := service.NewQueryUserClient(conn)
-	d := service.NewQueryAllClient(conn)
-
-	// Contact the server and print out its response.
 
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
 		defer h.DurationLog(time.Now(), "/search")
@@ -40,8 +49,10 @@ func main() {
 			log.Error("could not parse ID", "err", err)
 			id = 0
 		}
+
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
+
 		rRes, err := c.GetUser(ctx, &service.UserRequest{Id: int32(id)})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,23 +65,6 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/all", func(w http.ResponseWriter, r *http.Request) {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		rRes, err := d.GetAll(ctx, &service.All{})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		for i := range rRes.Users {
-			if err = server.Index(server.User(rRes.Users[i])).Render(ctx, w); err != nil {
-				log.Error("could not render template", "err", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		}
-	})
-
-	log.Info("Listening on :3000")
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Info("server", "addr", s.Addr)
+	log.Fatal(s.ListenAndServe())
 }

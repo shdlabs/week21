@@ -13,12 +13,12 @@ func TestTheBeginning(t *testing.T) {
 
 		user := NewUser("John", "NY", "123456789", 1.75, true)
 
-		h.Equal(t, user.ID, int32(0))
-		h.Equal(t, user.Fname, "John")
-		h.Equal(t, user.City, "NY")
+		h.Equal(t, user, User{ID: 0, Fname: "John", City: "NY", Phone: "123456789", Height: 1.75, Married: true})
 	})
 
 	t.Run("NewDBMock", func(t *testing.T) {
+		t.Parallel()
+
 		db := NewDBMock()
 		db.NewUsers(
 			NewUser("John", "NY", "123456789", 1.85, true),
@@ -46,7 +46,5 @@ func TestTheBeginning(t *testing.T) {
 			user = db.FindUser(52)
 			h.Equal(t, user, (User{}))
 		})
-
-		t.Logf(h.Ok("%#v themale test \n\t"), db)
 	})
 }
